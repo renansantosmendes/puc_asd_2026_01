@@ -1,0 +1,201 @@
+================================================================================
+                    ESTRUTURA DO PROJETO REFATORADO
+                    Clean Architecture + SOLID
+================================================================================
+
+puc_asd_2026_01/
+│
+├── 📄 main.py                          # Ponto de entrada da aplicação
+├── 📄 01_ml_classification_v1.py       # Versão anterior (para referência)
+├── 📄 requirements.txt                 # Dependências Python
+├── 📄 environment.yml                  # Ambiente Conda
+├── 📄 pytest.ini                       # Configuração do pytest
+│
+├── 📚 README.md                        # Documentação principal do projeto
+├── 📚 ARCHITECTURE.md                  # Documentação da arquitetura
+├── 📚 EXTENDING.md                     # Guia para estender o projeto
+│
+├── .gitignore                          # Arquivos a ignorar no git
+│
+├── src/                                # CÓDIGO-FONTE PRINCIPAL
+│   │
+│   ├── domain/                         # ⭐ CAMADA DE DOMÍNIO
+│   │   ├── entities/
+│   │   │   ├── __init__.py
+│   │   │   └── model.py                # Entidades de domínio
+│   │   │
+│   │   └── interfaces/
+│   │       ├── __init__.py
+│   │       └── repositories.py         # Interfaces abstratas
+│   │
+│   ├── application/                    # ⭐ CAMADA DE APLICAÇÃO
+│   │   ├── use_cases/
+│   │   │   ├── __init__.py
+│   │   │   ├── load_data_use_case.py
+│   │   │   ├── prepare_data_use_case.py
+│   │   │   ├── train_model_use_case.py
+│   │   │   └── evaluate_model_use_case.py
+│   │   │
+│   │   └── dto/
+│   │       ├── __init__.py
+│   │       └── model_dto.py            # Data Transfer Objects
+│   │
+│   ├── infrastructure/                 # ⭐ CAMADA DE INFRAESTRUTURA
+│   │   ├── repositories/
+│   │   │   ├── __init__.py
+│   │   │   └── data_repository.py      # Carregamento de dados
+│   │   │
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── preprocessing_service.py     # Normalização e divisão
+│   │   │   ├── model_training_service.py    # Treinamento de modelos
+│   │   │   ├── evaluation_service.py        # Avaliação de modelos
+│   │   │   ├── visualization_service.py     # Gráficos e visualizações
+│   │   │   └── persistence_service.py       # Salvamento de modelos
+│   │   │
+│   │   └── config/
+│   │       └── __init__.py
+│   │
+│   └── presentation/                   # ⭐ CAMADA DE APRESENTAÇÃO
+│       ├── __init__.py
+│       └── cli.py                      # Interface de linha de comando
+│
+└── tests/                              # 🧪 TESTES UNITÁRIOS
+    ├── __init__.py
+    └── test_example.py                 # Exemplos de testes com pytest
+
+================================================================================
+                        FLUXO DE DEPENDÊNCIAS
+================================================================================
+
+              Presentation Layer (CLI)
+                        ↓
+              Application Layer (Use Cases)
+                        ↓
+              Domain Layer (Interfaces)
+                        ↓
+              Infrastructure Layer (Services)
+                        ↓
+              External Libraries (scikit-learn, pandas, etc)
+
+================================================================================
+                         COMPONENTES POR CAMADA
+================================================================================
+
+DOMAIN LAYER (Domínio de Negócio):
+  ├── Entities: FetalHealthDataset, TrainTestSplit, ModelEvaluationResult
+  └── Interfaces: DataRepository, PreprocessingService, ModelTrainingService,
+                  EvaluationService, VisualizationService
+
+APPLICATION LAYER (Lógica de Negócio):
+  ├── Use Cases: LoadDataUseCase, PrepareDataUseCase, TrainModelUseCase,
+  │              EvaluateModelUseCase
+  └── DTOs: LoadDataRequest/Response, PrepareDataRequest/Response, etc.
+
+INFRASTRUCTURE LAYER (Implementações):
+  ├── Repositories: CSVDataRepository
+  ├── Services: SKLearnPreprocessingService, ScikitLearnModelTrainingService,
+  │             MetricsEvaluationService, MatplotlibVisualizationService,
+  │             PickleModelRepository
+  └── Config: Configurações e constantes
+
+PRESENTATION LAYER (Interface):
+  └── CLI: FetalHealthCLI (orquestra use cases)
+
+================================================================================
+                       SOLID PRINCIPLES APLICADOS
+================================================================================
+
+✅ Single Responsibility Principle (SRP)
+   Cada classe tem uma única responsabilidade
+   - PreprocessingService → apenas normalização
+   - TrainModelUseCase → apenas treinamento
+
+✅ Open/Closed Principle (OCP)
+   Aberto para extensão, fechado para modificação
+   - Novos modelos podem ser adicionados sem modificar código existente
+
+✅ Liskov Substitution Principle (LSP)
+   Subclasses podem substituir suas superclasses
+   - PickleModelRepository pode ser substituído por MongoModelRepository
+
+✅ Interface Segregation Principle (ISP)
+   Interfaces específicas, não genéricas
+   - PreprocessingService não inclui métodos de treinamento
+
+✅ Dependency Inversion Principle (DIP)
+   Depender de abstrações, não de implementações
+   - CLI depende de interfaces, não de classes concretas
+
+================================================================================
+                            COMO EXECUTAR
+================================================================================
+
+1. Instalar dependências:
+   $ pip install -r requirements.txt
+
+2. Executar a aplicação:
+   $ python main.py
+
+3. Rodar testes:
+   $ pytest tests/ -v
+
+4. Gerar relatório de cobertura:
+   $ pytest tests/ --cov=src --cov-report=html
+
+================================================================================
+                         ADICIONAR NOVOS MODELOS
+================================================================================
+
+Para adicionar um novo modelo (ex: XGBoost):
+
+1. Atualizar ScikitLearnModelTrainingService:
+   - Adicionar método _train_xgboost()
+   - Atualizar método train() para aceitar 'xgboost'
+
+2. Usar na CLI:
+   - train_response = self.train_model_use_case.execute(
+       TrainModelRequest(model_type='xgboost', ...)
+     )
+
+Ver EXTENDING.md para detalhes completos.
+
+================================================================================
+                        BENEFÍCIOS DA ARQUITETURA
+================================================================================
+
+✅ Testabilidade: Cada camada pode ser testada independentemente
+✅ Manutenibilidade: Código bem organizado e fácil de entender
+✅ Escalabilidade: Adicionar novas features sem quebrar existentes
+✅ Reusabilidade: Componentes podem ser reutilizados
+✅ Flexibilidade: Trocar implementações sem afetar o resto
+✅ Independência de Framework: Lógica de negócio não depende de bibliotecas
+
+================================================================================
+                         PRÓXIMOS PASSOS
+================================================================================
+
+1. ✅ Estrutura base criada
+2. ⏳ Adicionar mais tipos de modelos (XGBoost, RandomForest, etc)
+3. ⏳ Integração com MLflow para rastreamento
+4. ⏳ API REST para servir predições
+5. ⏳ Testes mais abrangentes
+6. ⏳ CI/CD pipeline
+
+================================================================================
+                              REFERÊNCIAS
+================================================================================
+
+Clean Architecture:
+  https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+
+SOLID Principles:
+  https://en.wikipedia.org/wiki/SOLID
+
+Design Patterns:
+  https://refactoring.guru/design-patterns
+
+scikit-learn Documentation:
+  https://scikit-learn.org/
+
+================================================================================
