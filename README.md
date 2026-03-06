@@ -1,7 +1,35 @@
-# Classificação de Saúde Fetal - Modelo de Machine Learning
+# 🏥 Classificação de Saúde Fetal - Modelo de Machine Learning
 
 **Autor**: Renan Santos Mendes  
 **Email**: renansantosmendes@gmail.com
+
+---
+
+## ⚡ Quick Start (5 minutos)
+
+**Quer começar rapidinho?** Leia o [QUICK_START.md](QUICK_START.md) para instruções passo a passo!
+
+```bash
+# 1. Configure o arquivo .env
+cp .env.example .env
+# → Edite o .env com suas credenciais DagsHub
+
+# 2. Instale dependências
+pip install -r requirements.txt
+
+# 3. Verifique a configuração
+python check_setup.py
+
+# 4. Inicie a API
+python run_api.py
+
+# 5. Em outro terminal, teste
+python example_api_test.py
+```
+
+**Documentação da API:** http://localhost:8000/docs
+
+---
 
 ## 📊 Sobre o Projeto
 
@@ -160,10 +188,75 @@ pytest tests/
 - **matplotlib/seaborn**: Visualizações
 - **mlflow**: Rastreamento de experimentos (opcional)
 
+## � Documentação Completa
+
+| Documento | Descrição |
+|-----------|-----------|
+| [QUICK_START.md](QUICK_START.md) | ⚡ Guia rápido para começar (5 minutos) |
+| [API_USAGE_GUIDE.md](API_USAGE_GUIDE.md) | 📖 Guia completo de uso da API |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | 🔧 Soluções para problemas comuns |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 🏗️ Detalhes da arquitetura Clean Architecture |
+| [api/README.md](api/README.md) | 📡 Documentação específica da API |
+
+---
+
+## 🆘 Tendo Problemas?
+
+### Antes de Começar
+1. Execute `python check_setup.py` para verificar a configuração
+2. Consulte [TROUBLESHOOTING.md](TROUBLESHOOTING.md) para problemas comuns
+3. Leia [QUICK_START.md](QUICK_START.md) para passo a passo detalhado
+
+### Problema Comum: Erro de Modelo não Encontrado
+```
+⚠️  Aviso: Nenhum modelo encontrado no MLflow
+```
+
+**Solução:** Consulte a seção "Nenhum modelo encontrado no MLflow" em [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
+### Problema Comum: Porta Já em Uso
+```
+OSError: [Errno 10048] Apenas um uso de cada endereço de socket...
+```
+
+**Solução:** Use outro `python run_api.py 8888`
+
+---
+
 ## 🔐 Segurança
 
-- ⚠️ Não comita chaves de API ou credentials
-- ✅ Use `.env` para variáveis sensíveis (veja `.gitignore`)
+- ⚠️ **Nunca** comita o arquivo `.env` com credenciais reais
+- ✅ Use `.env` apenas localmente para variáveis sensíveis
+- ✅ Use `secrets` ou variáveis de ambiente em produção
+- ✅ Veja `.gitignore` para arquivos excluídos
+
+---
+
+## 🎯 Fluxo de Trabalho Recomendado
+
+```
+1. Fazer Alterações
+          ↓
+2. Executar Testes (pytest)
+          ↓
+3. Fazer Predições com a API
+          ↓
+4. Registrar no MLflow/DagsHub
+          ↓
+5. Deploy
+```
+
+---
+
+## 📞 Contato & Suporte
+
+- **Autor**: Renan Santos Mendes
+- **Email**: renansantosmendes@gmail.com
+- **GitHub**: https://github.com/renansantosmendes
+
+Para reportar bugs ou sugerir melhorias, consulte a documentação ou entre em contato.
+
+---
 
 ## 📝 Licença
 
