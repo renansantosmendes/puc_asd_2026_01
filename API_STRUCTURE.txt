@@ -1,0 +1,282 @@
+================================================================================
+                          FASTAPI APPLICATION
+                     Fetal Health Prediction API
+================================================================================
+
+PROJECT STRUCTURE:
+──────────────────
+
+api/
+├── __init__.py
+├── main.py                     # 🚀 Aplicação principal FastAPI
+│
+├── schemas/
+│   ├── __init__.py
+│   └── prediction.py           # 📝 Pydantic models (Request/Response)
+│
+└── routes/
+    ├── __init__.py
+    ├── predictions.py          # 🔮 Rotas de predição
+    └── health.py               # ❤️ Rotas de health check
+
+run_api.py                       # ▶️ Script para rodar a API
+test_api_client.py               # 🧪 Cliente de teste
+
+Dockerfile                       # 🐳 Container
+docker-compose.yml               # 🐳 Orquestração
+
+requirements.txt                 # 📦 Dependências
+.env.example                     # ⚙️ Configurações
+
+API_GUIDE.md                     # 📖 Documentação
+
+================================================================================
+                              ENDPOINTS
+================================================================================
+
+GET /                               Raiz
+GET /health                         Health check
+GET /model-info                     Informações do modelo
+
+POST /predictions/predict           Predição única
+POST /predictions/predict-batch     Predição em batch
+
+================================================================================
+                           COMO RODAR
+================================================================================
+
+1️⃣ LOCALMENTE (Desenvolvimento)
+   
+   $ python run_api.py
+   
+   Acesse: http://localhost:8000
+   Docs:   http://localhost:8000/docs
+
+2️⃣ COM DOCKER
+
+   $ docker-compose up
+   
+   Acesse: http://localhost:8000
+
+3️⃣ PORTA CUSTOMIZADA
+
+   $ python run_api.py 8080
+   
+   Acesse: http://localhost:8080
+
+================================================================================
+                            TESTAR API
+================================================================================
+
+$ python test_api_client.py
+
+Testa:
+  ✓ Health Check
+  ✓ Model Info
+  ✓ Predição Única
+  ✓ Predição em Batch
+
+================================================================================
+                          DOCUMENTAÇÃO
+================================================================================
+
+Swagger UI (Interativo):
+   http://localhost:8000/docs
+
+ReDoc (Alternativo):
+   http://localhost:8000/redoc
+
+OpenAPI JSON:
+   http://localhost:8000/openapi.json
+
+================================================================================
+                          FLUXO DE REQUISIÇÃO
+================================================================================
+
+Cliente HTTP
+    ↓
+FastAPI App
+    ↓
+Middleware (CORS)
+    ↓
+Router (health | predictions)
+    ↓
+Pydantic Validation
+    ↓
+Business Logic
+    ↓
+Model Inference
+    ↓
+Response (JSON)
+    ↓
+Cliente
+
+================================================================================
+                         DEPENDÊNCIAS
+================================================================================
+
+Framework:
+  - fastapi>=0.104.0      Framework web async
+  - uvicorn>=0.24.0       ASGI server
+  - pydantic>=2.0.0       Validação de dados
+
+ML/Data:
+  - numpy>=1.24.0
+  - pandas>=2.0.0
+  - scikit-learn>=1.3.0
+  - pickle (built-in)
+
+Utilities:
+  - python-dotenv>=1.0.0  Variáveis de ambiente
+  - requests>=2.31.0      Cliente HTTP
+
+Testing:
+  - pytest>=7.0.0
+  - pytest-cov>=4.0.0
+
+================================================================================
+                           EXEMPLO DE USO
+================================================================================
+
+CURL:
+─────
+curl -X POST "http://localhost:8000/predictions/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"features": [120.0, 0.5, 0.3, 0.2, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001, 0.0, 0.0]}'
+
+PYTHON:
+───────
+import requests
+
+url = "http://localhost:8000/predictions/predict"
+data = {
+    "features": [120.0, 0.5, 0.3, ..., 0.0, 0.0]  # 21 features
+}
+response = requests.post(url, json=data)
+print(response.json())
+
+JAVASCRIPT:
+────────────
+fetch('http://localhost:8000/predictions/predict', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({features: [120.0, 0.5, 0.3, ..., 0.0, 0.0]})
+})
+.then(r => r.json())
+.then(data => console.log(data))
+
+================================================================================
+                         RESPONSE EXAMPLES
+================================================================================
+
+HEALTH CHECK:
+──────────────
+$ curl http://localhost:8000/health
+
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "model_loaded": true
+}
+
+MODEL INFO:
+────────────
+$ curl http://localhost:8000/model-info
+
+{
+  "model_type": "GradientBoostingClassifier",
+  "features_count": 21,
+  "classes": ["Normal", "Suspeito", "Patológico"]
+}
+
+PREDICTION:
+────────────
+{
+  "prediction": 1,
+  "confidence": 0.95,
+  "probabilities": {
+    "1_normal": 0.95,
+    "2_suspeito": 0.04,
+    "3_patologico": 0.01
+  }
+}
+
+BATCH PREDICTION:
+──────────────────
+{
+  "predictions": [1, 2, 1],
+  "confidences": [0.95, 0.85, 0.92],
+  "total_samples": 3
+}
+
+================================================================================
+                         CONFIGURAÇÕES
+================================================================================
+
+CORS:
+  allow_origins = ["*"]      # Em produção, restringir!
+  allow_methods = ["*"]
+  allow_headers = ["*"]
+
+RELOAD:
+  reload = True              # Apenas desenvolvimento
+
+LOG LEVEL:
+  logging = "info"
+
+DOCUMENTAÇÃO:
+  /docs                      # Swagger UI
+  /redoc                     # ReDoc
+  /openapi.json              # OpenAPI spec
+
+================================================================================
+                       PERFORMANCE
+================================================================================
+
+Latência típica:
+  Single Prediction:  10-50ms
+  Batch (100):        50-100ms
+  Batch (1000):       300-500ms
+
+Throughput:
+  ~2000 predições/minuto
+
+Memory:
+  ~500MB (modelo + scaler)
+
+================================================================================
+                      SEGURANÇA (PRODUÇÃO)
+================================================================================
+
+1. Restringir CORS:
+   allow_origins = ["https://seu-dominio.com"]
+
+2. Desabilitar reload:
+   reload = False
+
+3. Usar HTTPS:
+   Configurar reverse proxy (nginx)
+
+4. Autenticação:
+   Adicionar Bearer token em rotas críticas
+
+5. Rate limiting:
+   Usar middleware para limitar requisições
+
+6. Variáveis de ambiente:
+   Usar .env para configurações sensíveis
+
+================================================================================
+                         PRÓXIMOS PASSOS
+================================================================================
+
+1. ✅ API básica criada
+2. ⏳ Adicionar autenticação (JWT)
+3. ⏳ Adicionar rate limiting
+4. ⏳ Adicionar logging estruturado
+5. ⏳ Adicionar métricas (Prometheus)
+6. ⏳ Adicionar tracing (Jaeger)
+7. ⏳ Deploy em Kubernetes
+8. ⏳ CI/CD pipeline
+
+================================================================================

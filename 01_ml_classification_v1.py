@@ -26,6 +26,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from time import time
+from dotenv import load_dotenv
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -33,6 +34,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
 from sklearn.utils.class_weight import compute_class_weight
+
+# Carregar variáveis de ambiente do arquivo .env
+load_dotenv()
 
 # Importar MLflow (opcional)
 try:
@@ -291,18 +295,30 @@ def load_model(filepath="model.pkl"):
 
 def setup_mlflow():
     """
-    Configura integração com MLflow e DagsHub.
+    Configura integração com MLflow e DagsHub usando variáveis do arquivo .env
     """
     if not MLFLOW_AVAILABLE:
         print("MLflow não disponível. Pulando setup.")
         return False
     
     print("\nConfigurando MLflow...")
-    os.environ['MLFLOW_TRACKING_USERNAME'] = 'renansantosmendes'
-    os.environ['MLFLOW_TRACKING_PASSWORD'] = 'cc41cc48f8e489dd5b87404dd6f9720944e32e9b'
-    mlflow.set_tracking_uri("https://dagshub.com/renansantosmendes/asia_asd_o9.mlflow")
+    
+    # Carregar variáveis de ambiente
+    mlflow_username = os.getenv('MLFLOW_TRACKING_USERNAME')
+    mlflow_password = os.getenv('MLFLOW_TRACKING_PASSWORD')
+    mlflow_uri = os.getenv('MLFLOW_TRACKING_URI')
+    
+    if not all([mlflow_username, mlflow_password, mlflow_uri]):
+        print("Erro: Variáveis de ambiente do MLflow não configuradas no arquivo .env")
+        return False
+    
+    # Configurar variáveis de ambiente
+    os.environ['MLFLOW_TRACKING_USERNAME'] = mlflow_username
+    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password
+    mlflow.set_tracking_uri(mlflow_uri)
     mlflow.sklearn.autolog(log_input_examples=True)
     
+    print(f"✓ MLflow configurado com sucesso para: {mlflow_uri}")
     return True
 
 
